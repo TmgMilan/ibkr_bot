@@ -1,7 +1,6 @@
 from ib_insync import *
 from dotenv import load_dotenv
 import os
-import time
 
 load_dotenv()
 
@@ -12,10 +11,10 @@ print(f"Using IBKR ACCOUNT ID: {acc_id}")
 
 #initialize your instance of the TWS
 ib = IB()
-ib.connect('host.docker.internal', 7497, clientId=0)
+ib.connect("host.docker.internal", 7496, clientId=0)
 
 #change the watchlst for whatever ticker you want to watch
-watchlst = ["NIO", "IREN", "DLO"]
+watchlst = ["IREN", "DLO"]
 
 #the a way to view its market data
 lstOfContracts = [Stock(ticker, 'SMART', 'USD') for ticker in watchlst]
@@ -24,10 +23,9 @@ lstOfMktData = [ib.reqMktData(contract, '', False, False) for contract in lstOfC
 #look to print the price every 3 seconds
 try:
     while True:
-        ib.sleep(1)
+        ib.sleep(3)
         for ticker in lstOfMktData:
-            print(f"{ticker.contract.symbol} - Last price: {ticker.last}")
-        time.sleep(3)
-except KeyBoardInterrupt:
+            print(f"{ticker.contract.symbol} - Last price: {ticker.bid}")
+except KeyboardInterrupt:
     print("Disconnecting...")
     ib.disconnect()

@@ -1,28 +1,30 @@
-FROM debian:bookworm-slim
+FROM python:3.12-slim AS builder
 
-#update and upgrade
-RUN apt-get update && apt-get upgrade -y
-
-#utilities and the jdk needed
-RUN apt-get install -y openjdk-17-jre-headless \
-			python3 python3-pip python3.11-venv \
-			vim
-
-# the working dir
 WORKDIR /app
 
-#copying requirement.txt
-COPY requirements.txt
+COPY requirements.txt ./
+RUN pip wheel --no-cache-dir -r requirements.txt --wheel-dir wheels
 
-#python dependencies install
-RUN pip install --no-cache-dir -r requirements.txt
-
-#copying the python client and running it
-COPY ./TWS_API/source/pythonclient /app/pythonclient
-RUN python3 /app/pythonclient/setup.py install
-
-#copy the actual python file that gives me the results
+COPY pythonclient/ibapi/ ./ibapi/
+COPY pythonclient/setup.py .
 COPY bot.py .
 
-#the env file that you will need to create to put in ur credentials named IBKR_ACCOUNT_ID
-COPY .env .
+RUN pip wheel --no-cache-dir --wheel-dir wheels .
+
+FROM python:3.12-slim AS runner
+
+COPY --from=builder /app/wheels /wheels
+COPY --from=builder /app/bot.py bot.py
+COPY .env .env
+
+# Install tzdata properly
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+# Fix US/Eastern alias
+RUN mkdir -p /usr/share/zoneinfo/US \
+    && ln -s /usr/share/zoneinfo/America/New_York /usr/share/zoneinfo/US/Eastern
+ENV TZ=America/New_York
+
+RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
