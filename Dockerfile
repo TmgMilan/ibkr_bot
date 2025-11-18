@@ -7,14 +7,13 @@ RUN pip wheel --no-cache-dir -r requirements.txt --wheel-dir wheels
 
 COPY pythonclient/ibapi/ ./ibapi/
 COPY pythonclient/setup.py .
-COPY bot.py .
 
 RUN pip wheel --no-cache-dir --wheel-dir wheels .
 
 FROM python:3.12-slim AS runner
 
 COPY --from=builder /app/wheels /wheels
-COPY --from=builder /app/bot.py bot.py
+COPY bot.py .
 COPY .env .env
 
 # Install tzdata properly
