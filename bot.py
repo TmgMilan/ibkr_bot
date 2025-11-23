@@ -1,6 +1,7 @@
 from ib_insync import *
 from dotenv import load_dotenv
 import os
+import tickerForDiscord
 
 load_dotenv()
 
