@@ -4,6 +4,8 @@ import logging
 from dotenv import load_dotenv
 import os
 import tickerForDiscord
+import ibkrBot
+import asyncio
 
 load_dotenv()
 
@@ -20,17 +22,34 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 async def on_ready():
     print("we are online")
 
+CheckIfTrue = False
+
+async def printTickersloop(ctx):
+    try:
+        while CheckIfTrue:
+            toPrint = ibkrBot.printTickers()
+            await ctx.send(toPrint)
+            await asyncio.sleep(3)
+    except:
+        print("Closing Loop for tickers")
+
 @bot.command()
 async def stockticker(ctx, *args):
-    if args[0] == "addTicker":
-        for i in range(1, len(args)):
-            tickerForDiscord.addTicker(args[i])
-        await ctx.send(f'added the {args[1:]}')
-    elif args[0] == "rmTickers":
-        for i in range(1, len(args)):
-            tickerForDiscord.deleteTicker(args[i])
-            await ctx.send(f'deleted the {args[1:]}')
-    elif args[0] == "getTickers":
-        await ctx.send(tickerForDiscord.getTicker())
+    global CheckIfTrue
+    FirstArg = args[0]
+    if FirstArg == "addTicker":
+        addtask = bot.loop.create_task(ibkrBot.MarketData(args[1:]))
+        await ctx.send(f"Adding tickers: {', '.join(args[1:])}")
+    
+    elif FirstArg == "LookTicker":
+        CheckIfTrue = True
+        task = bot.loop.create_task(printTickersloop(ctx))
+    
+    elif FirstArg == "StopLook":
+        CheckIfTrue = False
+        await ctx.send("Stopped Printing tickers")
+
+    elif FirstArg == "getTicker":
+        await ctx.send(ibkrBot.getTicker())
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
