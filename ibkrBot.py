@@ -1,7 +1,6 @@
 from ib_insync import *
 from dotenv import load_dotenv
 import os
-import tickerForDiscord
 import asyncio
 
 load_dotenv()
@@ -20,9 +19,9 @@ lstOfMktData = set()
 DictOfContracts = {}
 
 #the a way to view its market data
+# also i made it async to send message to discord if the ticker isnt real
+# need to implement a ibkrs function that checks if the ticker exists and sends it to discord awaiting
 async def MarketData(args):
-    global lstOfMktData
-    global DictOfContracts
     for ticker in args:
         if ticker not in lstOfMktData:
             lstOfMktData.add(ticker)
@@ -44,3 +43,12 @@ def getTicker():
         return lstOfMktData
     else:
         return "{ }"
+
+def RmTicker(args):
+    for ticker in args:
+        if ticker in lstOfMktData:
+            lstOfMktData.remove(ticker)
+        else:
+            #need to implement a discord func that ends myself a message
+            pass
+

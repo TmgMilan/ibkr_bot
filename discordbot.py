@@ -3,7 +3,6 @@ from discord.ext import commands
 import logging
 from dotenv import load_dotenv
 import os
-import tickerForDiscord
 import ibkrBot
 import asyncio
 
@@ -51,5 +50,9 @@ async def stockticker(ctx, *args):
 
     elif FirstArg == "getTicker":
         await ctx.send(ibkrBot.getTicker())
+
+    elif FirstArg == "removeTicker":
+        ibkrBot.RmTicker(args[1:])
+        await ctx.send(f"Removing Tickers: {','.join(args[1:])}")
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)

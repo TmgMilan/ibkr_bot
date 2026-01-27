@@ -4,5 +4,6 @@
 #python stuff
 __pycache__/
 
-
+venv/
+#logs
 discord.log
