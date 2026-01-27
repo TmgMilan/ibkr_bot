@@ -7,7 +7,7 @@ you can run either the dockerfile by using:
     python3 ibkrBot.py
 or running on your local host machine by:
     changing "host.docker.internal" to "127.0.0.1" or vice versa to run on your docker
-    python3 ibkrBot.py
+    python3 discordbot.py
 
 
 Add your stock tickers and make sure you have subscription to the exchange that the ticker is being traded at:
